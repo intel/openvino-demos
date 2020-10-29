@@ -1,6 +1,6 @@
 # OpenVINO™ in AWS
 
-Currently, we offer OpenVINO™ AMI in the AWS marketplace. Please see [Getting Started Guide to Launch EC2 with OpenVINO™](aws/ami/Getting-Started-Guide-to-Launch-EC2-with-OpenVINO.pdf)
+Currently, we offer OpenVINO™ AMI in the AWS marketplace. Please see [Getting Started Guide to Launch EC2 with OpenVINO™](ami/Getting-Started-Guide-to-Launch-EC2-with-OpenVINO.pdf)
 
 ## Licensing
 
