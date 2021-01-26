@@ -1,0 +1,43 @@
+|                              TFHub Model URL (TF1.x)                             | Input Shape | Precision type |
+|:--------------------------------------------------------------------------------:|:-----------:|:--------------:|
+| https://tfhub.dev/deepmind/ganeval-cifar10-convnet/1                             | 1,32,32,3   | FP16, FP32     |
+| https://tfhub.dev/google/aiy/vision/classifier/birds_V1/1                        | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/aiy/vision/classifier/plants_V1/1                       | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b0/classification/1                        | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/amoebanet_a_n18_f448/classification/1          | 1,331,331,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/efficientnet/lite4/classification/2                 | 1,380,380,3 | FP16, FP32     |
+| https://tfhub.dev/google/aiy/vision/classifier/insects_V1/1                      | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b7/classification/1                        | 1,600,600,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/quantops/classification/3 | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_025_128/quantops/classification/3 | 1,128,128,3 | FP16, FP32     |
+| https://tfhub.dev/google/aiy/vision/classifier/food_V1/1                         | 1,192,192,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_100_192/quantops/classification/3 | 1,192,192,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_100_160/quantops/classification/3 | 1,160,160,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_100_128/quantops/classification/3 | 1,128,128,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_075_224/quantops/classification/3 | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_075_192/quantops/classification/3 | 1,192,192,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_075_160/quantops/classification/3 | 1,160,160,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_075_128/quantops/classification/3 | 1,128,128,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_050_224/quantops/classification/3 | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_050_192/quantops/classification/3 | 1,192,192,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_050_160/quantops/classification/3 | 1,160,160,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_050_128/quantops/classification/3 | 1,128,128,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_025_224/quantops/classification/3 | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_025_160/quantops/classification/3 | 1,160,160,3 | FP16, FP32     |
+| https://tfhub.dev/google/imagenet/mobilenet_v1_025_192/quantops/classification/3 | 1,192,192,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b4/classification/1                        | 1,380,380,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b3/classification/1                        | 1,300,300,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/efficientnet/lite2/classification/2                 | 1,260,260,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/efficientnet/lite0/classification/2                 | 1,224,224,3 | FP16, FP32     |
+| https://tfhub.dev/metmuseum/vision/classifier/imet_attributes_V1/1               | 1,299,299,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b1/classification/1                        | 1,240,240,3 | FP16, FP32     |
+| https://tfhub.dev/google/planet/vision/classifier/planet_v2/1                    | 1,299,299,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b5/classification/1                        | 1,456,456,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b2/classification/1                        | 1,260,260,3 | FP16, FP32     |
+| https://tfhub.dev/google/efficientnet/b6/classification/1                        | 1,528,528,3 | FP16, FP32     |
+| https://tfhub.dev/svampeatlas/vision/classifier/fungi_mobile_V1/2                | 1,299,299,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/efficientnet/lite3/classification/2                 | 1,300,300,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/efficientnet/lite1/classification/2                 | 1,240,240,3 | FP16, FP32     |
+| https://tfhub.dev/tensorflow/tfgan/eval/mnist/logits/1                           | 1,28,28,1   | FP16, FP32     |
+| https://tfhub.dev/deepmind/llr-pretrain-adv/linear/1                             | 1,1,1,2048  | FP16, FP32     |
+|                                                                                  |             |                |
