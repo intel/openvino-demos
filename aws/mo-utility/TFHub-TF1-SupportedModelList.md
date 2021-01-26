@@ -1,5 +1,5 @@
-|                              TFHub Model URL (TF1.x)                             | Input Shape | Precision type |
-|:--------------------------------------------------------------------------------:|:-----------:|:--------------:|
+|                           TFHub Model URL (TF1.x)                                | Input Shape | Precision type |
+|----------------------------------------------------------------------------------|-------------|----------------|
 | https://tfhub.dev/deepmind/ganeval-cifar10-convnet/1                             | 1,32,32,3   | FP16, FP32     |
 | https://tfhub.dev/google/aiy/vision/classifier/birds_V1/1                        | 1,224,224,3 | FP16, FP32     |
 | https://tfhub.dev/google/aiy/vision/classifier/plants_V1/1                       | 1,224,224,3 | FP16, FP32     |
