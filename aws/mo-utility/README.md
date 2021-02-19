@@ -1,4 +1,4 @@
-# OpenVINO Model Optimization in Sagemaker
+# OpenVINO™ Model Optimization in AWS Sagemaker
 
 This demonstrates a OpenVINO utility to convert Keras or TFHub models or TF object detection models in AWS Sagemaker instance.
 
