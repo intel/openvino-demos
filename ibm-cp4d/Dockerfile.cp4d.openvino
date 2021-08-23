@@ -1,0 +1,100 @@
+ARG  base_image_tag
+FROM ${base_image_tag}
+
+ENV http_proxy=
+ENV https_proxy=
+
+# Operating system packages must be installed as root.
+USER root:root
+
+# If you don't need to install additional operating system packages from the
+# default repositories, remove the "microdnf install" command and package list,
+# but keep the rest of this RUN statement. This will install security updates.
+# The chown and chmod commands are needed when system certificates get updated.
+RUN microdnf update \
+   && microdnf install --nodocs \
+   poppler-utils \
+   && microdnf clean all \
+   && rm -rf /var/cache/yum \
+   && chown -cR :wsbuild \
+   /etc/pki/ca-trust/source/anchors/ \
+   /etc/pki/ca-trust/extracted/ \
+   && chmod -cR g+w \
+   /etc/pki/ca-trust/source/anchors/ \
+   /etc/pki/ca-trust/extracted/
+
+
+# =========================================
+# Change display name of the Jupyter kernel
+# =========================================
+# The kernel spec is in /opt/ibm/run/kernels/<name>/
+# It must be modified as root.
+
+RUN sed -i -e '/display_name/{s/",/ with modifications",/}' \
+   /opt/ibm/run/kernels/*/kernel.json
+
+
+# ==================================================
+# Modify the conda environment of the Jupyter kernel
+# ==================================================
+# The name of the kernel conda environment is given by $DSX_KERNEL_CONDENV.
+# The examples assume that you are modifying the conda environment of the
+# base image. If you prefer to create and use a different conda environment
+# from scratch, set DSX_KERNEL_CONDENV to the name of that environment.
+#
+# The conda environment should be changed with user and group "wsbuild".
+# In each layer, call fix-conda-permissions to ensure group write permission,
+# because some files may get installed without respect for the umask.
+
+USER wsbuild:wsbuild
+
+# If you need to add files to the image, use
+# COPY --chown=wsbuild:wsbuild ...
+
+
+# ===========================
+# Install packages with conda
+# ===========================
+
+# If you don't need to install packages with conda, remove this RUN statement.
+# RUN umask 002 \
+#  && conda install -n $DSX_KERNEL_CONDENV \
+#     basemap=1.3.0 \
+#     py4j \
+#  && source /opt/ibm/build/bin/installutils.sh \
+#  && fix-conda-permissions
+
+# =========================
+# Install packages with pip
+# =========================
+
+# If you don't need to install packages with pip, remove this RUN statement.
+RUN umask 002 \
+   && conda run -n $DSX_KERNEL_CONDENV pip uninstall -y opencv-python
+# Install this specific version of OpenCV to prevent libGl errors
+RUN umask 002 \
+   && conda run -n $DSX_KERNEL_CONDENV pip install opencv-python-headless==4.2.0.32
+# Install OpenVINO
+RUN umask 002 \
+   && conda run -n $DSX_KERNEL_CONDENV pip install --ignore-installed PyYAML openvino-dev
+
+RUN umask 002 \
+   && conda run -n $DSX_KERNEL_CONDENV pip install \
+   astrotools==1.4.2 \
+   scikit-multilearn \
+   scikit-plot \
+   seawater \
+   fuzzy \
+   segyio \
+   tensorflow-serving-api\
+   tqdm \
+   && source /opt/ibm/build/bin/installutils.sh \
+   && fix-conda-permissions
+
+ENV http_proxy=
+ENV https_proxy=
+
+# ======================================
+# change from build user to runtime user
+# ======================================
+USER $DSX_USERNAME:wsbuild

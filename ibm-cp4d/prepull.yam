@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+labels:
+app: imagePrepull
+run: jupyter-py36-ov
+name: jupyter-py36-ov-pull
+spec:
+completions: 20
+parallelism: 20
+template:
+  metadata:
+    labels:
+      app: imagePrepull
+      run: jupyter-py36-ov
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: beta.kubernetes.io/arch
+              operator: In
+              values:
+              - amd64
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: run
+              operator: In
+              values:
+              - jupyter-py36-ov
+          topologyKey: kubernetes.io/hostname
+    containers:
+    - command:
+      - echo
+      - Image default-route-openshift-image-registry.tester-cloud-99-0000.us.containers.appdomain.cloud/zen/wslocal-runtime-py36main-ov:3.5.2011.1800-amd64-ov preloaded
+      image: default-route-openshift-image-registry.tester-cloud-99-0000.us.containers.appdomain.cloud/zen/wslocal-runtime-py36main-ov:3.5.2011.1800-amd64-ov
+      imagePullPolicy: Always
+      name: jupyter-custom-container
+    restartPolicy: OnFailure
