@@ -9,7 +9,8 @@ For detailed instructions see: [Customizing environment definitions (Watson Stud
 
 ## 1. By using conda and pip directly in a notebook
 
-Run the following statements in your IBM CP4D Jupyter notebook. Use Python 3.6 environment.
+Run the following statements in your IBM CP4D Jupyter notebook. Use **Python 3.6 environment.**
+
 OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bit.
 
 **See [this Sample Notebook](ov-install-ibm-cp4d-jupyter.ipynb) for detailed instructions.**
