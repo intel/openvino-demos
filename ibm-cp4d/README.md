@@ -32,7 +32,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
 
 ## 2. Creating and registering a custom image
 
-**For detailed instructions see:** [Customizing environments > Building custom images](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/build-cust-images.html)
+**For detailed instructions see:** [Customizing environments > Building custom images](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/build-cust-images.html) and [Customizing environment definitions (Watson Studio)](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/cust-env-parent.html)
 
 **Required role:** You must be a **Cloud Pak for Data cluster administrator** to create and register a custom image.
 
@@ -112,7 +112,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
 1. Adding customizations and building a new image. See [Creating a custom image.](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/create-customized-image.html)
 
     ```bash
-    # docker build \
+    docker build \
     -t <new-image-name>:<new-image-tag> \
     --build-arg base_image_tag= <your_image_registry_location>/wslocal-x86-runtime-python36:master-273 \
     -f <path_to_dockerfile> .
