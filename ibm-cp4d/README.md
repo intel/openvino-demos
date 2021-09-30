@@ -5,7 +5,7 @@ In this Readme, we show two methods to install OpenVINO in IBM CP4D (v3.5.0) Wat
 1. By using conda and pip directly in a notebook
 1. By building a customized image
 
-For detailed instructions see: [Customizing environment definitions (Watson Studio)](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/cust-env-parent.html)
+For detailed instructions see: [Customizing environment definitions (Watson Studio)](https://www.ibm.com/docs/en/cloud-paks/cp-data/3.5.0?topic=environments-customizing)
 
 ## 1. By using conda and pip directly in a notebook
 
@@ -32,7 +32,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
 
 ## 2. Creating and registering a custom image
 
-**For detailed instructions see:** [Customizing environments > Building custom images](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/build-cust-images.html) and [Customizing environment definitions (Watson Studio)](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/cust-env-parent.html)
+**For detailed instructions see:** [Customizing environments > Building custom images](https://www.ibm.com/docs/en/cloud-paks/cp-data/3.5.0?topic=environments-building-custom-images) and [Customizing environment definitions (Watson Studio)](https://www.ibm.com/docs/en/cloud-paks/cp-data/3.5.0?topic=environments-customizing)
 
 **Required role:** You must be a **Cloud Pak for Data cluster administrator** to create and register a custom image.
 
@@ -55,7 +55,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
     ```
 
 1. Prepare to build a new image by:
-    - **Get the registry URL** to use for Docker commands and in scripts. The Watson Studio runtime images are stored in a Docker image registry. In Cloud Pak for Data, you can only use an external registry outside of the Cloud Pak for Data OpenShift cluster.
+    - **Get the registry URL** to use for Docker commands and in scripts. The Watson Studio runtime images are stored in a Docker image registry. In Cloud Pak for Data, you can only use an external registry outside of the Cloud Pak for Data OpenShift cluster. See [Accessing the registry](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/access-registry.html) for more details.
 
     - To use that registry, you need the URL to the external registry that was used during the installation of Cloud Pak for Data. You use the same URL for all commands and in all scripts that you run.
 
@@ -88,7 +88,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
     myToken=`curl -k ${cloudPakforData_URL}/v1/preauth/validateAuth -u ${uname}:${pwd} | sed -n -e 's/^.*accessToken":"//p' | cut -d'"' -f1`
     ```
 
-    - **Download the configuration file** for the runtime image that you want to customize. See [Downloading the configuration file](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/download-runtime-def.html), for list of JSON configuration files. In this README we chose  `jupyter-py36-server.json`
+    - **Download the configuration file** for the runtime image that you want to customize. See [Downloading the configuration file](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/download-runtime-def.html), for list of JSON configuration files. In this README we chose  `jupyter-py36-server.json`
 
     ```bash
     curl -X GET \
@@ -103,13 +103,13 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
     docker login -u kubeadmin -p $(oc whoami -t) ${openshift_image_registry_route}
     ```
 
-    - **Download the image** in the configuration. See [Downloading the image.](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/download-base-image.html)
+    - **Download the image** in the configuration. See [Downloading the image.](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/download-base-image.html)
 
     ```bash
     docker pull ${openshift_image_registry_route}/zen/wslocal-runtime-py36main:3.5.2011.1800-amd64
     ```
 
-1. Adding customizations and building a new image. See [Creating a custom image.](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/create-customized-image.html)
+1. Adding customizations and building a new image. See [Creating a custom image.](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/create-customized-image.html)
 
     ```bash
     docker build \
@@ -140,7 +140,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
     # Contol+D to exit the docker container
     ```
 
-1. Pushing the image to the container server. See [Registering the custom image.](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/register-image.html)
+1. Pushing the image to the container server. See [Registering the custom image.](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/register-image.html)
 
     ```bash
     # docker tag <new-image-name> <target_registry>/<new-image-name>:<new-image-tag>
@@ -156,7 +156,7 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
     ${openshift_image_registry_route}/zen/wslocal-runtime-py36main-ov:3.5.2011.1800-amd64-ov
     ```
 
-1. Changing and uploading the configuration file. See [Uploading the change configuration.](https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/wsj/analyze-data/upload-runtime-def.html)
+1. Changing and uploading the configuration file. See [Uploading the change configuration.](https://www.ibm.com/docs/en/SSQNUZ_3.5.0/wsj/analyze-data/upload-runtime-def.html)
 
     ```bash
     cp jupyter-py36-server.json jupyter-py36-ov2021-server.json
@@ -178,4 +178,4 @@ OpenVINO currently supports Python 3.6, 3.8 on Red Hat Enterprise Linux 8, 64-bi
    -F upFile=@jupyter-py36-ov2021-server.json -k
     ```
 
-1. After this, you should be able to see this newly created environment defintion when you create a new environment.
+1. After this, you should be able to see this newly created environment defintion when you create a new environment. Follow these steps to [create an environment definition.](https://www.ibm.com/docs/en/cloud-paks/cp-data/3.5.0?topic=images-using-custom-image-in-projects)
