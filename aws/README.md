@@ -1,6 +1,6 @@
 # OpenVINO™ in AWS
 
-Currently, we offer [OpenVINO™ AMI in the AWS marketplace](https://aws.amazon.com/marketplace/pp/B08LZJJZR3/). Please see [Getting Started Guide to Launch EC2 with OpenVINO™](ami/Getting-Started-Guide-to-Launch-EC2-with-OpenVINO.pdf)
+Currently, we offer [OpenVINO™ AMI in the AWS marketplace](https://aws.amazon.com/marketplace/pp/prodview-sa76mydxmlmwk). Please see [Getting Started Guide to Launch EC2 with OpenVINO™](ami/Getting-Started-Guide-to-Launch-EC2-with-OpenVINO.pdf)
 
 ## Blog
 
