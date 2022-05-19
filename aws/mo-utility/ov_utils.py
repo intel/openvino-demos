@@ -109,7 +109,7 @@ def create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params):
               --output_dir {ir_output_path}  \
               --transformations_config  {ir_input_json} \
               --tensorflow_object_detection_api_pipeline_config {ir_input_config} \
-              --disable_nhwc_to_nchw "
+               "
     else:
         mo_cmd = f"mo \
               --saved_model_dir {saved_model_dir} \
@@ -117,7 +117,7 @@ def create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params):
               --data_type {ir_data_type} \
               --output_dir {ir_output_path}  \
               --model_name {ir_model_name}  \
-              --disable_nhwc_to_nchw "
+              {mo_params['mo_keras_arg']} "
 
     if not os.path.exists(saved_model_dir):
         sys.exit(
@@ -186,9 +186,12 @@ def create_ir(create_ir_params):
     output_dir = create_ir_params.get("output_dir", ".")
     mo_params = create_ir_params.get("mo_params", ".")
     bucket_name = create_ir_params.get("bucket_name", ".")
+    # for keras models, --disable_nhwc_to_nchw argument is needed for mo
+    mo_params['mo_keras_arg'] = ""
 
     if create_ir_params.get("keras_app_model_name"):
         print(create_ir_params["keras_app_model_name"])
+        mo_params['mo_keras_arg'] = "--disable_nhwc_to_nchw "
         keras_app_model_name = create_ir_params["keras_app_model_name"]
         keras_app_opts = create_ir_params.get("keras_app_opts", "(weights='imagenet')")
         saved_model_dir, model_inp_shape = download_keras_app_model(
@@ -255,4 +258,4 @@ def create_ir(create_ir_params):
         )
 
     create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params)
-    upload_to_s3(output_dir, bucket_name)
+    #upload_to_s3(output_dir, bucket_name)
