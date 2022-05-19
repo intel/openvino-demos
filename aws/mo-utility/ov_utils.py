@@ -16,63 +16,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # ==============================================================================
 
-import tensorflow as tf
-import tensorflow_hub as hub
+import shlex
 import shutil
 import sys
 import os
-from pathlib import Path
-import docker
 import zipfile
+from subprocess import run, PIPE
 import boto3
-from botocore.exceptions import ClientError
-
-# Set log level to ERROR for tensorflow, PIL, IPKernelAPP
-import logging
-
-logging.getLogger("tensorflow").setLevel(logging.ERROR)
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-
-def download_ov_image(docker_image, tag):
-    docker_client = docker.from_env()
-    try:
-        # Check if docker image: openvino/ubuntu18_dev:tf2 exist locally
-        _ = docker_client.images.get(docker_image + ":" + tag)
-        print(f"{docker_image} Docker image found locally !")
-    except:
-        print(
-            f"\nDownloading Docker image: {docker_image}:latest (about 5GB), This might take few minutes if this is the first time..."
-        )
-        try:
-            docker_client.images.pull(docker_image, tag="latest")
-            print(f"{docker_image}:latest Docker image downloaded successfully !")
-        except Exception as err:
-            sys.exit(f"{err} \n{docker_image}:latest Docker image download FAILED !")
-        try:
-            # Create docker image: openvino/ubuntu18_dev:tf2
-            install_tf2_cmd = "pip install tensorflow -U"
-            environment = []
-            container_name = "ov-tf2"
-            print(f"Installing latest tensorflow into {docker_image} ...")
-            docker_output = docker_client.containers.run(
-                name=container_name,
-                image=docker_image + ":latest",
-                remove=False,
-                command=install_tf2_cmd,
-                environment=environment,
-                user="root",
-            )
-
-            # commit the container with latest TF installed
-            ov_tf2_container = docker_client.containers.get(container_name)
-            ov_tf2_container.commit(repository=docker_image, tag="tf2")
-            ov_tf2_container.remove()
-            print(f"Successfully created {docker_image}:tf2 !")
-        except Exception as err:
-            sys.exit(f"{err} \n{docker_image}:tf2 docker image creation FAILED !!")
-            ov_tf2_container = docker_client.containers.get(container_name)
-            ov_tf2_container.remove()
+import tensorflow as tf
+import mo_tf
+import tensorflow_hub as hub
 
 
 def download_keras_app_model(
@@ -124,61 +77,47 @@ def zipdir(path, ziph):
             ziph.write(os.path.join(root, file))
 
 
-def create_ir_from_saved_model(
-    saved_model_dir,
-    model_inp_shape,
-    mo_params,
-):
+def create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params):
     ir_model_name = mo_params["model_name"]
     ir_data_type = mo_params["data_type"]
-    ir_model_dir = "IR_models/" + ir_data_type
+    ir_model_dir = "".join(["IR_models/", ir_data_type])
     ir_output_path = "".join([saved_model_dir, "/", ir_model_dir])
-    docker_saved_model_dir = "/mnt/"
-    docker_ir_output_path = "".join([docker_saved_model_dir, "/", ir_model_dir])
+    mo_tf_file_path = mo_tf.__file__
+
     if model_inp_shape == "None":
-        model_dir_list = [
-            f
-            for f in os.listdir(saved_model_dir)
-            if os.path.isfile(os.path.join(saved_model_dir, f)) and f.endswith(".pb")
-        ]
         config_list = [
             f
             for f in os.listdir(saved_model_dir)
             if os.path.isfile(os.path.join(saved_model_dir, f))
             and f.endswith(".config")
         ]
-        docker_input_json = "".join(
+        ir_input_json = "".join(
             [
-                "deployment_tools/model_optimizer/extensions/front/tf/",
-                mo_params["input_json"],
-            ]
-        )
-
-        if len(model_dir_list) > 1:
-            print("There are more than one pb file")
-        else:
-            input_model = model_dir_list[0]
-
-        docker_input_model = "".join([docker_saved_model_dir, input_model])
+                mo_tf_file_path.replace("mo_tf.py", ""),
+                "mo/extensions/front/tf/",
+                mo_params["input_json"]
+            ])
 
         if len(config_list) > 1:
             print("There are more than one config file")
         else:
             input_config = config_list[0]
 
-        docker_input_config = "".join([docker_saved_model_dir, input_config])
-        mo_cmd = f"mo_tf.py \
-              --input_model {docker_input_model} \
-              --output_dir {docker_ir_output_path}  \
-              --tensorflow_object_detection_api_pipeline_config {docker_input_config} \
-              --tensorflow_use_custom_operations_config {docker_input_json}"
+        ir_input_config = "".join([saved_model_dir, input_config])
+        mo_cmd = f"python3 {mo_tf_file_path} \
+              --saved_model_dir {saved_model_dir} \
+              --output_dir {ir_output_path}  \
+              --transformations_config  {ir_input_json} \
+              --tensorflow_object_detection_api_pipeline_config {ir_input_config} \
+              --disable_nhwc_to_nchw "
     else:
-        mo_cmd = f"mo_tf.py \
-              --saved_model_dir {docker_saved_model_dir} \
+        mo_cmd = f"mo \
+              --saved_model_dir {saved_model_dir} \
               --input_shape {model_inp_shape} \
               --data_type {ir_data_type} \
-              --output_dir {docker_ir_output_path}  \
-              --model_name {ir_model_name}"
+              --output_dir {ir_output_path}  \
+              --model_name {ir_model_name}  \
+              --disable_nhwc_to_nchw "
 
     if not os.path.exists(saved_model_dir):
         sys.exit(
@@ -189,46 +128,28 @@ def create_ir_from_saved_model(
         print(f"{ir_output_path} exists already. Deleting the folder...")
         shutil.rmtree(ir_output_path)
 
-    # Download OpenVINO docker image: "openvino/ubuntu18_dev:tf2".
-    docker_client = docker.from_env()
-    download_ov_image("openvino/ubuntu18_dev", "tf2")
-    openvino_image = "openvino/ubuntu18_dev:tf2"
-
     print("\nStarting IR creation using OpenVINO model optimizer... ")
     print("\n--".join(mo_cmd.split("--")))
     print("\nPlease wait till the IR files are created... ")
-
-    environment = [
-        "CUDA_VISIBLE_DEVICES=-1",
-        "PATH=/opt/intel/openvino/deployment_tools/model_optimizer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "LD_LIBRARY_PATH=/opt/intel/openvino/opencv/lib:/opt/intel/openvino/deployment_tools/ngraph/lib:/opt/intel/openvino/deployment_tools/inference_engine/external/hddl_unite/lib:/opt/intel/openvino/deployment_tools/inference_engine/external/hddl/lib:/opt/intel/openvino/deployment_tools/inference_engine/external/gna/lib:/opt/intel/openvino/deployment_tools/inference_engine/external/mkltiny_lnx/lib:/opt/intel/openvino/deployment_tools/inference_engine/external/tbb/lib:/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64",
-        "PYTHONPATH=/opt/intel/openvino/python/python3.6:/opt/intel/openvino/python/python3:/opt/intel/openvino/deployment_tools/tools/post_training_optimization_toolkit:/opt/intel/openvino/deployment_tools/open_model_zoo/tools/accuracy_checker:/opt/intel/openvino/deployment_tools/model_optimizer",
-    ]
-
-    # Run the OpenVINO model optimizer via Docker container
-    docker_output = docker_client.containers.run(
-        image=openvino_image,
-        remove=True,
-        command=mo_cmd,
-        environment=environment,
-        user="root",
-        volumes={
-            Path(saved_model_dir).absolute(): {
-                "bind": docker_saved_model_dir,
-                "mode": "rw",
-            }
-        },
-    )
-
-    print(docker_output.decode("utf-8"))
-
-    if os.path.exists(ir_output_path):
+    cmd = shlex.split(mo_cmd)
+    try:
+        return_args = run(cmd, stderr=PIPE, stdout=PIPE)
+    except Exception as err:
+        print(err)
+    
+    ov_ir_xml_path = "".join([ir_output_path, "/", ir_model_name, ".xml"])
+    if os.path.exists(ov_ir_xml_path):
         print(f"\nOpenVINO model saved in: {ir_output_path}")
-        # Update permissions of the files created by docker.
-        update_permissions_cmd = f"sudo chown $USER:$USER -R {saved_model_dir}"
-        os.system(update_permissions_cmd)
+        # Update permissions of the files.
+        update_permissions_cmd_str = f"sudo chown $USER:$USER -R {saved_model_dir}"
+        update_permissions_cmd = shlex.split(update_permissions_cmd_str)
+        run(update_permissions_cmd, stderr=PIPE, stdout=PIPE)
     else:
-        print("\nOpenVINO model creation FAILED ! ")
+        err_msg = f"\n {ov_ir_xml_path} not created. OpenVINO IR creation FAILED ! "
+        print(err_msg)
+        raise Exception(err_msg)
+        
+    return return_args
 
 
 def upload_to_s3(output_dir, bucket_name):
@@ -277,9 +198,11 @@ def create_ir(create_ir_params):
         mo_params = create_ir_params.get("mo_params", ".")
         model_name = create_ir_params["mo_params"]["model_name"]
         url = create_ir_params["objdet_model_url"]
-        url_command = f"wget '{url}'"
+        url_command_str = f"wget '{url}'"
+        url_command = shlex.split(url_command_str)
         tar_name = url.split("/")[-1]
-        untar_command = f"tar -xvf {tar_name}"
+        untar_command_str = f"tar -xvf {tar_name}"
+        untar_command = shlex.split(untar_command_str)
 
         if os.path.isdir(output_dir):
             print(output_dir, "exists already. Deleting the folder")
@@ -288,13 +211,13 @@ def create_ir(create_ir_params):
             print(tar_name, "exists already. Deleting it")
             os.remove(tar_name)
 
-        exit_code = os.system(url_command)
+        exit_code = run(url_command, stderr=PIPE, stdout=PIPE)
 
         if exit_code != 0:
             print("Failed to Download model")
         else:
             print("Downloaded the model")
-            untar_exit_code = os.system(untar_command)
+            untar_exit_code = run(untar_command, stderr=PIPE, stdout=PIPE)
             if untar_exit_code != 0:
                 print("Failed to untar")
             else:
@@ -321,12 +244,14 @@ def create_ir(create_ir_params):
             model_inp_shape = str(model_inp_shape).replace(" ", "")
         else:
             sys.exit(
-                "Either keras_app_model_name or tfhub_model_url or saved_model_dir should be given to create IR"
+                "Either keras_app_model_name or tfhub_model_url or saved_model_dir \n"
+                "should be given to create IR"
             )
 
     else:
         sys.exit(
-            "Either keras_app_model_name or tfhub_model_url or objdet_model_url,input_shape or saved_model_dir,input_shape should be given to create IR"
+            "Either keras_app_model_name or tfhub_model_url or objdet_model_url,\n"
+            "input_shape or saved_model_dir,input_shape should be given to create IR"
         )
 
     create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params)
