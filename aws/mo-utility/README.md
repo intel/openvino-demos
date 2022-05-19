@@ -3,22 +3,22 @@
 
 This demonstrates a OpenVINO utility to convert Keras or TFHub models or TF object detection models in AWS Sagemaker notebook instance.
 
-![ov-utils-arch.png](ov-utils-arch.png)
+<img src="ov-utils-arch.png" width="300">
 
 ## Prerequisites
 
 - AWS Sagemaker notebook instance. 
 	- Recommended instance type: `ml.t3.xlarge`
-	- Choose `notebook-al2-v1` as Platform identifier
+	- Choose `notebook-al2-v1` as Platform identifier. `al2` refers to Amazon Linux 2.
 
-![sagemaker-instance-selection.png](sagemaker-instance-selection.png)
+<img src="sagemaker-instance-selection.png" width="300">
 
 ## Instructions
 
-1. Launch AWS Sagemaker Jupyer Notebook instance. See [Prerequisites](#Prerequisites).
+1. Launch AWS Sagemaker Jupyer Notebook instance. See [Prerequisites](#prerequisites).
 
 2. Upload the [ov_utils.py](ov_utils.py) and [requirements.txt](requirements.txt)
-3. Upload one of the jupyter notebook from this repo as per your requirement. See [Examples](#Examples).
+3. Upload one of the jupyter notebook from this repo as per your requirement. See [Examples](#examples).
 4. Follow the instruction provided in Jupyter Notebook.
 
 ## Examples
