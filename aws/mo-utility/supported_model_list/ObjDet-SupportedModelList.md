@@ -1,4 +1,10 @@
-﻿|    	| TF Object Detection Model URL (TF2)                                                                                                    	| json                     	| Precision type 	|
+Please scroll horizontally to see 2nd column “json”, which is a required parameter (`input_json`) when converting TF HUB Object detection models.
+
+
+For additional documentation, see [https://docs.openvino.ai/latest/openvino_docs_MO_DG_prepare_model_convert_model_tf_specific_Convert_Object_Detection_API_Models.html] Convert TensorFlow Object Detection API Models.
+
+
+|    	| TF Object Detection Model URL (TF2)                                                                                                    	| json                     	| Precision type 	|
 |----	|----------------------------------------------------------------------------------------------------------------------------------------	|--------------------------	|----------------	|
 | 1  	| http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz                                         	| ssd_v2_support.json      	| FP16, FP32     	|
 | 2  	| http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_0.75_depth_300x300_coco14_sync_2018_07_03.tar.gz               	| ssd_v2_support.json      	| FP16, FP32     	|

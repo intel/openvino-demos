@@ -20,6 +20,7 @@ import shlex
 import shutil
 import sys
 import os
+import glob
 import zipfile
 from subprocess import run, PIPE
 import boto3
@@ -95,21 +96,35 @@ def create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params):
             [
                 mo_tf_file_path.replace("mo_tf.py", ""),
                 "mo/extensions/front/tf/",
-                mo_params["input_json"]
-            ])
+                mo_params["input_json"],
+            ]
+        )
 
         if len(config_list) > 1:
             print("There are more than one config file")
         else:
             input_config = config_list[0]
 
-        ir_input_config = "".join([saved_model_dir, input_config])
+        tf_obj_det_pipeline_config = "".join([saved_model_dir, "/", input_config])
+
+        frozen_pb_path = "".join([saved_model_dir, "/", "frozen_inference_graph.pb"])
+        saved_model_pb_path = "".join(
+            [saved_model_dir, "/", "saved_model", "/", "saved_model.pb"]
+        )
+
+        if os.path.exists(frozen_pb_path):
+            model_input = f"--input_model {frozen_pb_path}"
+        elif os.path.exists(saved_model_pb_path):
+            model_input = f"--saved_model_dir {saved_model_dir}/saved_model/"
+        else:
+            model_input = f"--saved_model_dir {saved_model_dir}"
+
         mo_cmd = f"python3 {mo_tf_file_path} \
-              --saved_model_dir {saved_model_dir} \
+              {model_input} \
               --output_dir {ir_output_path}  \
               --transformations_config  {ir_input_json} \
-              --tensorflow_object_detection_api_pipeline_config {ir_input_config} \
-               "
+              --tensorflow_object_detection_api_pipeline_config {tf_obj_det_pipeline_config} \
+              --reverse_input_channels "
     else:
         mo_cmd = f"mo \
               --saved_model_dir {saved_model_dir} \
@@ -129,26 +144,29 @@ def create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params):
         shutil.rmtree(ir_output_path)
 
     print("\nStarting IR creation using OpenVINO model optimizer... ")
-    print("\n--".join(mo_cmd.split("--")))
+    print("\ \n--".join(mo_cmd.split("--")))
     print("\nPlease wait till the IR files are created... ")
     cmd = shlex.split(mo_cmd)
+
     try:
-        return_args = run(cmd, stderr=PIPE, stdout=PIPE)
+        return_args = run(cmd, stderr=PIPE, stdout=PIPE, text=True)
+        print(return_args.stdout)
+        print(return_args.stderr)
     except Exception as err:
         print(err)
-    
-    ov_ir_xml_path = "".join([ir_output_path, "/", ir_model_name, ".xml"])
-    if os.path.exists(ov_ir_xml_path):
-        print(f"\nOpenVINO model saved in: {ir_output_path}")
+
+    ov_ir_xml_path = glob.glob(f"{ir_output_path}/*.xml")
+    if ov_ir_xml_path:
+        print(f"\nOpenVINO model saved in: {ov_ir_xml_path}")
         # Update permissions of the files.
         update_permissions_cmd_str = f"sudo chown $USER:$USER -R {saved_model_dir}"
         update_permissions_cmd = shlex.split(update_permissions_cmd_str)
         run(update_permissions_cmd, stderr=PIPE, stdout=PIPE)
     else:
-        err_msg = f"\n {ov_ir_xml_path} not created. OpenVINO IR creation FAILED ! "
+        err_msg = f"\n {ir_output_path} not created. OpenVINO IR creation FAILED ! "
         print(err_msg)
         raise Exception(err_msg)
-        
+
     return return_args
 
 
@@ -187,11 +205,11 @@ def create_ir(create_ir_params):
     mo_params = create_ir_params.get("mo_params", ".")
     bucket_name = create_ir_params.get("bucket_name", ".")
     # for keras models, --disable_nhwc_to_nchw argument is needed for mo
-    mo_params['mo_keras_arg'] = ""
+    mo_params["mo_keras_arg"] = ""
 
     if create_ir_params.get("keras_app_model_name"):
         print(create_ir_params["keras_app_model_name"])
-        mo_params['mo_keras_arg'] = "--disable_nhwc_to_nchw "
+        mo_params["mo_keras_arg"] = "--disable_nhwc_to_nchw "
         keras_app_model_name = create_ir_params["keras_app_model_name"]
         keras_app_opts = create_ir_params.get("keras_app_opts", "(weights='imagenet')")
         saved_model_dir, model_inp_shape = download_keras_app_model(
@@ -214,15 +232,21 @@ def create_ir(create_ir_params):
             print(tar_name, "exists already. Deleting it")
             os.remove(tar_name)
 
-        exit_code = run(url_command, stderr=PIPE, stdout=PIPE)
+        download_cmd_out = run(url_command, stderr=PIPE, stdout=PIPE, text=True)
 
-        if exit_code != 0:
+        if download_cmd_out.returncode != 0:
             print("Failed to Download model")
+            print(download_cmd_out.stdout)
+            print(download_cmd_out.stderr)
+            sys.exit("Failed to Download model !")
         else:
             print("Downloaded the model")
-            untar_exit_code = run(untar_command, stderr=PIPE, stdout=PIPE)
-            if untar_exit_code != 0:
+            untar_cmd_out = run(untar_command, stderr=PIPE, stdout=PIPE, text=True)
+            if untar_cmd_out.returncode != 0:
                 print("Failed to untar")
+                print(untar_cmd_out.stdout)
+                print(untar_cmd_out.stderr)
+                sys.exit("Failed to UNTAR the downloaded model !")
             else:
                 print("Untarred the downloaded model")
                 os.rename(model_name, output_dir)
@@ -258,4 +282,4 @@ def create_ir(create_ir_params):
         )
 
     create_ir_from_saved_model(saved_model_dir, model_inp_shape, mo_params)
-    #upload_to_s3(output_dir, bucket_name)
+    # upload_to_s3(output_dir, bucket_name)
