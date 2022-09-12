@@ -22,6 +22,6 @@ This demonstrates a OpenVINO utility to convert Keras or TFHub models or TF obje
 
 ## Examples
 
-- For Keras models, run [create_ir_for_keras.ipynb](create_ir_for_keras.ipynb). See [supported_model_list/Keras-SupportedModelList.md](Keras-SupportedModelList.md)
-- For TFHub models, run [create_ir_for_tfhub.ipynb](create_ir_for_tfhub.ipynb). See [supported_model_list/TFHub-SupportedModelList.md](TFHub-SupportedModelList.md)
-- For Object detection models, run [create_ir_for_obj_det.ipynb](create_ir_for_obj_det.ipynb). See [supported_model_list/ObjDet-SupportedModelList.md](ObjDet-SupportedModelList.md)
+- For Keras models, run [create_ir_for_keras.ipynb](create_ir_for_keras.ipynb). See [Keras-SupportedModelList.md](supported_model_list/Keras-SupportedModelList.md)
+- For TFHub models, run [create_ir_for_tfhub.ipynb](create_ir_for_tfhub.ipynb). See [TFHub-SupportedModelList.md](supported_model_list/TFHub-SupportedModelList.md)
+- For Object detection models, run [create_ir_for_obj_det.ipynb](create_ir_for_obj_det.ipynb). See [ObjDet-SupportedModelList.md](supported_model_list/ObjDet-SupportedModelList.md)

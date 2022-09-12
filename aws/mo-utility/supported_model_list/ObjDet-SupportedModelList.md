@@ -1,7 +1,7 @@
 Please scroll horizontally to see 2nd column “json”, which is a required parameter (`input_json`) when converting TF HUB Object detection models.
 
 
-For additional documentation, see [https://docs.openvino.ai/latest/openvino_docs_MO_DG_prepare_model_convert_model_tf_specific_Convert_Object_Detection_API_Models.html] Convert TensorFlow Object Detection API Models.
+For additional documentation, see [Convert TensorFlow Object Detection API Models](https://docs.openvino.ai/latest/openvino_docs_MO_DG_prepare_model_convert_model_tf_specific_Convert_Object_Detection_API_Models.html)
 
 
 |    	| TF Object Detection Model URL (TF2)                                                                                                    	| json                     	| Precision type 	|
