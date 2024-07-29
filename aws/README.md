@@ -3,8 +3,10 @@
 Currently, we offer [OpenVINO™ AMI in the AWS marketplace](https://aws.amazon.com/marketplace/pp/prodview-sa76mydxmlmwk). 
 
 - Please see [Getting Started Guide to Launch EC2 with OpenVINO™](ami/Getting-Started-Guide-to-Launch-EC2-with-OpenVINO.pdf)
-- See [Video Instructions to Launch OpenVINO AMI](https://youtu.be/ICdrUpWD26Q)
 - See [Instructions to connect to OpenVINO AMI with RDP/VNC session](https://www.youtube.com/watch?v=K0eJshISQv4)
+- See [Video Instructions to Launch OpenVINO AMI](https://youtu.be/ICdrUpWD26Q)
+
+[![YouTube Video](https://img.youtube.com/vi/ICdrUpWD26Q/0.jpg)](https://www.youtube.com/watch?v=ICdrUpWD26Q)
 
 ## Blog
 
